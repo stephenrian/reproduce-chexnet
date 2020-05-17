@@ -29,6 +29,9 @@ import csv
 import cxr_dataset as CXR
 import eval_model as E
 
+# efficientnet
+from efficientnet_pytorch import EfficientNet
+
 use_gpu = torch.cuda.is_available()
 gpu_count = torch.cuda.device_count()
 print("Available GPU count:" + str(gpu_count))
@@ -200,7 +203,7 @@ def train_cnn(PATH_TO_IMAGES, LR, WEIGHT_DECAY):
 
     """
     NUM_EPOCHS = 100
-    BATCH_SIZE = 16
+    BATCH_SIZE = 8 #before=16
 
     try:
         rmtree('results/')
@@ -262,8 +265,13 @@ def train_cnn(PATH_TO_IMAGES, LR, WEIGHT_DECAY):
     # please do not attempt to train without GPU as will take excessively long
     if not use_gpu:
         raise ValueError("Error, requires GPU")
-    model = models.densenet121(pretrained=True)
-    num_ftrs = model.classifier.in_features
+    
+    # model = models.densenet121(pretrained=True)
+    model = EfficientNet.from_pretrained('efficientnet-b7')
+    
+    #num_ftrs = model.classifier.in_features #1024
+    num_ftrs = 1024 #manual changes due efficientnet's model lacks of .classifier.in_features built-in method
+    
     # add final layer with # outputs in same dimension of labels with sigmoid
     # activation
     model.classifier = nn.Sequential(
