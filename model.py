@@ -267,7 +267,7 @@ def train_cnn(PATH_TO_IMAGES, LR, WEIGHT_DECAY):
         raise ValueError("Error, requires GPU")
     
     # model = models.densenet121(pretrained=True)
-    model = EfficientNet.from_pretrained('efficientnet-b7')
+    model = EfficientNet.from_pretrained('efficientnet-b7', num_classes=14)
     
     #num_ftrs = model.classifier.in_features #1024
     num_ftrs = 1024 #manual changes due efficientnet's model lacks of .classifier.in_features built-in method
@@ -281,7 +281,7 @@ def train_cnn(PATH_TO_IMAGES, LR, WEIGHT_DECAY):
     model = model.cuda()
 
     # define criterion, optimizer for training
-    criterion = nn.BCELoss()
+    criterion = nn.MSELoss(reduction='sum') #before: nn.BCELoss()
     optimizer = optim.SGD(
         filter(
             lambda p: p.requires_grad,
